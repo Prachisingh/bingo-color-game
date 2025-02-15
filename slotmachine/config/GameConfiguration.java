@@ -38,18 +38,8 @@ public class GameConfiguration {
     public Map<String, SlotSymbolWaysPayConfig> payout = createPayout();
 
     public List<List<String[]>> reelSets = createReelSets();
-    public WeightedPrizeData reel1And2Sym = createReel1And2Sym();
-    public WeightedPrizeData reel3And4Sym = createRee3And4Sym();
-
-    public WeightedPrizeData reel5And6Sym = createRee5And6Sym();
-
-    public WeightedPrizeData reel1Fg = createReel1Fg();
-    public WeightedPrizeData reel2Fg = createReelSym2Fg();
-    public WeightedPrizeData reel3Fg = createReelSym3Fg();
-    public WeightedPrizeData reel4Fg = createReelSym4Fg();
-    public WeightedPrizeData reel5Fg = createReelSym5Fg();
-
-    public WeightedPrizeData reel6Fg = createReelSym6Fg();
+    public WeightedPrizeData wheelPrizes = createWheelPrizes();
+    public WeightedPrizeData jackpotPrizes = createJackpotPrizes();
 
     public Map createPayout() {
 
@@ -184,4 +174,40 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(9, 6))
                 .addWeightedConfig(new WeightedPrizeConfig(6, 7));
     }
+
+    public WeightedPrizeData createWheelPrizes() {
+        return new WeightedPrizeData()
+                .addWeightedConfig(new WeightedPrizeConfig(70, 25))
+                .addWeightedConfig(new WeightedPrizeConfig(90, 12))
+                .addWeightedConfig(new WeightedPrizeConfig(40, 100))
+                .addWeightedConfig(new WeightedPrizeConfig(85, 20))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 12))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 50))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 15))
+                .addWeightedConfig(new WeightedPrizeConfig(60, 30))
+                .addWeightedConfig(new WeightedPrizeConfig(85, 20))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 0)) // 0 means second wheel will be used
+                .addWeightedConfig(new WeightedPrizeConfig(80, 15))
+                .addWeightedConfig(new WeightedPrizeConfig(60, 30))
+                .addWeightedConfig(new WeightedPrizeConfig(80, 20))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 50)) ;
+    }
+    public WeightedPrizeData createJackpotPrizes() {
+        return new WeightedPrizeData()
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(25, 3))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 2))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 2))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 2))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(25, 3))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 2))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 2)) ;
+    }
+
 }

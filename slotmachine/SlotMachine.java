@@ -3,15 +3,11 @@ package slotmachine;
 import slotmachine.config.GameConfiguration;
 import slotmachine.config.SlotSymbolWaysPayConfig;
 import slotmachine.dto.WinData;
-import slotmachine.service.FreeSpins;
-import slotmachine.service.Spin;
+import slotmachine.service.*;
 import slotmachine.util.GameUtility;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static slotmachine.util.GameUtility.printSlotFace;
 
 /**
  * Main class of the game that starts the base game, so the spinning and performs cascading. It also triggers the free games.
@@ -62,9 +58,65 @@ public class SlotMachine {
             spin.setFsAwarded(fsAwarded);
             spin.setFsTriggered(true);
         }
+        matchColours(spin, rng, gameConfiguration);
+
+        if (spin.isWheelTriggered()) {
+            Wheel wheel = new Wheel();
+            int result = spinWheel(gameConfiguration, rng);
+            if (result != 0) {
+                // award bet multiplier
+                wheel.setBetMultiplier(result);
+                BigDecimal win = BigDecimal.valueOf(result).multiply(BigDecimal.valueOf(stake));
+                wheel.setWheelWins(win);
+//                System.out.println("Wheel wins: " + win);
+//                System.out.println("Bet multiplier: " + result);
+//                System.out.println();
+            } else {
+                // award jackpot
+                wheel.setJackpotWheelTriggered(true);
+                int index = spinJackpotWheel(gameConfiguration, rng, wheel);
+                int prize = JackpotPrizes.getPrizeBasedOnIndex(index).prize;
+                wheel.setBetMultiplier(prize);
+                BigDecimal win = BigDecimal.valueOf(prize).multiply(BigDecimal.valueOf(stake));
+                wheel.setWheelWins(win);
+//                System.out.println("Jackpot win: " + win);
+            }
+            spin.setWheel(wheel);
+        }
+
         spin.setTotalWin(totalWin);
 
         return spin;
+    }
+
+    private static void matchColours(Spin spin, Random rng, GameConfiguration gameConfiguration) {
+        int color1 = rng.nextInt(6);
+        int color2 = rng.nextInt(6);
+        int color3 = rng.nextInt(6);
+        int colorAtBottom = rng.nextInt(6);
+        Colours colours = new Colours();
+        List<Integer> colorsAtTop = new ArrayList<>();
+        colorsAtTop.add(color1);
+        colorsAtTop.add(color2);
+        colorsAtTop.add(color3);
+        colours.setColourAtBottom(colorAtBottom);
+        colours.setColoursAtTop(colorsAtTop);
+        spin.setColours(colours);
+        if (color1 == color2 && color2 == color3 && color3 == colorAtBottom) {
+            spin.setWheelTriggered(true);
+//            System.out.println("Wheel triggered");
+//            System.out.println(spin.getColours());
+        }
+
+
+    }
+
+    private static int spinJackpotWheel(GameConfiguration gameConfiguration, Random rng, Wheel wheel) {
+        return WeightedPrizeService.getPrizes(rng, gameConfiguration.jackpotPrizes);
+    }
+
+    private static int spinWheel(GameConfiguration gameConfiguration, Random rng) {
+        return WeightedPrizeService.getPrizes(rng, gameConfiguration.wheelPrizes);
     }
 
     public static void createGrid(Random rng, boolean isFreeGame, List<String[]> bgReelsA, List<Integer> stopPosition, List<String[]> slotFace, GameConfiguration gameConfiguration) {
@@ -87,7 +139,7 @@ public class SlotMachine {
             if (!winDataList.isEmpty()) {
 //                for (WinData win : winDataList) {
 //
-//                    //Syster.out.println("- Ways win " + win.getPosList().stream().map(Object::toString).collect(Collectors.joining("-")) + ", " + win.getSymbolName() + " X" + win.getSymCountOnEachCol().size() + ", " + win.getWinAmount() + ", Ways: " + win.getWays());
+//                    //System.out.println("- Ways win " + win.getPosList().stream().map(Object::toString).collect(Collectors.joining("-")) + ", " + win.getSymbolName() + " X" + win.getSymCountOnEachCol().size() + ", " + win.getWinAmount() + ", Ways: " + win.getWays());
 //                }
                 cascadeCounter++;
                 //Syster.out.println("Cascade: " + cascadeCounter);
@@ -97,11 +149,10 @@ public class SlotMachine {
                 shiftSymbolsDownwards(slotFace);
 
                 //Syster.out.println("Shifted Symbols ");
-               // printSlotFace(slotFace, gameConfiguration);
+                // printSlotFace(slotFace, gameConfiguration);
                 fillEmptyPosition(slotFace, stopPosition, isFreeGame, gameConfiguration);
 
-            }
-            else {
+            } else {
                 //Syster.out.println("No more wins");
             }
             cascadeList.add(winDataList);
@@ -143,7 +194,7 @@ public class SlotMachine {
         }
         //Syster.out.println("Updated stop positions: " + stopPositions.stream().map(Object::toString).collect(Collectors.joining("-")));
         //Syster.out.println("updated screen ");
-       // printSlotFace(slotFace, gameConfiguration);
+        // printSlotFace(slotFace, gameConfiguration);
     }
 
 
@@ -185,10 +236,10 @@ public class SlotMachine {
     private static String[] selectReels(int boardHeight, String[] reel, int position) {
         String[] boardReel = new String[boardHeight];
         for (int i = 0; i < boardHeight; i++) {
-            if((position + i) % reel.length == -1){
+            if ((position + i) % reel.length == -1) {
                 throw new RuntimeException("Exception caught");
             }
-            boardReel[i] = reel[(position + i ) % reel.length];
+            boardReel[i] = reel[(position + i) % reel.length];
 
 
         }

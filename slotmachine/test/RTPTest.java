@@ -15,13 +15,14 @@ import java.util.concurrent.Executors;
 
 public class RTPTest {
 
-    static int eachRun = 125000_00;
+    static int eachRun = 125000_0;
     static int finishedCount = 0;
     static long startingTime;
     static RtpResult rtpResult = new RtpResult();
     private static int finishedThreadCount = 0;
     static int availableThreads = Runtime.getRuntime().availableProcessors();
     static int stake = 1;
+    static BigDecimal minorJPSeedValue = BigDecimal.valueOf(50);
 
 
     public static void main(String[] args) throws InterruptedException {
@@ -43,7 +44,11 @@ public class RTPTest {
         BigDecimal totalWins = BigDecimal.ZERO;
         BigDecimal totalFreeSpinsWins = BigDecimal.ZERO;
         BigDecimal totalBaseGameWins = BigDecimal.ZERO;
+        BigDecimal totalWheelWins = BigDecimal.ZERO;
         BigDecimal highestWinMultiplier = BigDecimal.ZERO;
+        BigDecimal totalMinorJPIncWins = BigDecimal.ZERO;
+        BigDecimal totalMajorJPIncWins = BigDecimal.ZERO;
+        BigDecimal totalGrandJPIncWins = BigDecimal.ZERO;
 
         BigDecimal highestWin = BigDecimal.ZERO;
         int numOfTimesFsTriggered = 0;
@@ -54,11 +59,32 @@ public class RTPTest {
 
             BigDecimal baseGameWin = BigDecimal.ZERO;
             BigDecimal freeSpinWins = BigDecimal.ZERO;
-            BigDecimal currentWins = BigDecimal.ZERO;
+            BigDecimal currentWins;
+            BigDecimal wheelWins = BigDecimal.ZERO;
+            BigDecimal minorProgressiveIncWin = BigDecimal.valueOf(0.002).multiply(BigDecimal.valueOf(stake));
+            totalMinorJPIncWins = totalMinorJPIncWins.add(minorProgressiveIncWin);
+
+            BigDecimal majorProgressiveIncWin = BigDecimal.valueOf(0.002).multiply(BigDecimal.valueOf(stake));
+            totalMajorJPIncWins = totalMajorJPIncWins.add(majorProgressiveIncWin);
+
+            BigDecimal grandProgressiveIncWin = BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(stake));
+            totalGrandJPIncWins = totalGrandJPIncWins.add(grandProgressiveIncWin);
+
+
             List<String[]> bgReelSet = gameConfiguration.reelSets.getFirst();
             Spin baseSpin = SlotMachine.playBaseGame(stake, rng, false, bgReelSet, gameConfiguration);
             calculateOfAKindWins(baseSpin, winningMap);
             baseGameWin = baseGameWin.add(baseSpin.getTotalWin());
+            if (baseSpin.isWheelTriggered()){
+                Wheel wheel = baseSpin.getWheel();
+                wheelWins = wheel.getWheelWins();
+//                if(wheel.isJackpotWheelTriggered()){
+//                    // which jackpot is triggered
+//
+//                }
+            }
+
+
             if (baseSpin.isFsTriggered()) {
                 numOfTimesFsTriggered++;
                 Spin freeSpin = FreeSpins.playFreeSpins(rng, baseSpin.getFsAwarded(), gameConfiguration);
@@ -66,11 +92,12 @@ public class RTPTest {
                  calculateOfAKindWins(freeSpin, winningMap);
 
             }
-            totalWins = totalWins.add(baseGameWin).add(freeSpinWins);
-            currentWins = baseGameWin.add(freeSpinWins);
+            totalWins = totalWins.add(baseGameWin).add(freeSpinWins).add(wheelWins);
+            currentWins = baseGameWin.add(freeSpinWins).add(wheelWins);
             totalFreeSpinsWins = totalFreeSpinsWins.add(freeSpinWins);
 
             totalBaseGameWins = totalBaseGameWins.add(baseGameWin);
+            totalWheelWins = totalWheelWins.add(wheelWins);
 
             BigDecimal currentWinMultiplier = currentWins.divide(BigDecimal.valueOf(stake), new MathContext(4, RoundingMode.HALF_EVEN));
             if (currentWinMultiplier.compareTo(highestWinMultiplier) > 0) {
@@ -90,11 +117,15 @@ public class RTPTest {
         rtpResult.setTotalWins(totalWins);
         rtpResult.setTotalFreeSpinsWins(totalFreeSpinsWins);
         rtpResult.setTotalBaseGameWins(totalBaseGameWins);
+        rtpResult.setTotalWheelWins(totalWheelWins);
         rtpResult.setHighestWinMultiplier(highestWinMultiplier);
         rtpResult.setHighestWin(highestWin);
         rtpResult.setNumOfTimesFsTriggered(numOfTimesFsTriggered);
         rtpResult.setTotalRuns(eachRun);
         rtpResult.setWinningMap(winningMap);
+        rtpResult.setTotalMinorJpIncWins(totalMinorJPIncWins);
+        rtpResult.setTotalMajorJpIncWins(totalMajorJPIncWins);
+        rtpResult.setTotalGrandJpIncWins(totalGrandJPIncWins);
 
         return rtpResult;
 
@@ -223,6 +254,7 @@ public class RTPTest {
         System.out.println("RTP is " + rtp + "%");
         System.out.println("Breakup:");
         System.out.println("Base Game RTP :" + rtpResult.getTotalBaseGameWins().divide(BigDecimal.valueOf(totalStake), new MathContext(4, RoundingMode.HALF_EVEN)));
+        System.out .println("Wheel RTP :" + rtpResult.getTotalWheelWins().divide(BigDecimal.valueOf(totalStake), new MathContext(4, RoundingMode.HALF_EVEN)));
         System.out.println("Free Spins RTP :" + rtpResult.getTotalFreeSpinsWins().divide(BigDecimal.valueOf(totalStake), new MathContext(4, RoundingMode.HALF_EVEN)));
         System.out.println("Highest win: " + rtpResult.getHighestWin());
         System.out.println("Highest win Multiplier: " + rtpResult.getHighestWinMultiplier());
@@ -231,6 +263,17 @@ public class RTPTest {
 //        System.out.println("Avg Spins to trigger free Spins : " + eachRun / rtpResult.getNumOfTimesFsTriggered());
 //        System.out.println("Free Spins Average pay: " + rtpResult.getTotalFreeSpinsWins().divide(BigDecimal.valueOf(rtpResult.getNumOfTimesFsTriggered()), new MathContext(4, RoundingMode.HALF_EVEN)));
         System.out.println();
+
+        System.out.println("Minor JP Incremental wins: " + rtpResult.getTotalMinorJpIncWins());
+        System.out.println("Total Minor JP Amount: " + rtpResult.getTotalMinorJpIncWins().add(minorJPSeedValue));
+        System.out.println("Minor JP RTP: " + rtpResult.getTotalMinorJpIncWins().divide(BigDecimal.valueOf(totalStake), new MathContext(4, RoundingMode.HALF_EVEN)));
+
+
+        System.out.println("Major JP Incremental wins: " + rtpResult.getTotalMajorJpIncWins());
+        System.out.println("Major JP RTP: " + rtpResult.getTotalMajorJpIncWins().divide(BigDecimal.valueOf(totalStake), new MathContext(4, RoundingMode.HALF_EVEN)));
+
+        System.out.println("Grand JP Incremental wins: " + rtpResult.getTotalGrandJpIncWins());
+        System.out.println("Grand JP RTP: " + rtpResult.getTotalGrandJpIncWins().divide(BigDecimal.valueOf(totalStake), new MathContext(4, RoundingMode.HALF_EVEN)));
         getPayDistributionForEachSymbol(rtpResult.getWinningMap(), totalStake);
     }
 

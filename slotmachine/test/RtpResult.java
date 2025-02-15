@@ -10,9 +10,38 @@ public class RtpResult {
     private BigDecimal totalWins = BigDecimal.ZERO;
     private BigDecimal totalFreeSpinsWins = BigDecimal.ZERO;
     private BigDecimal totalBaseGameWins = BigDecimal.ZERO;
+    private BigDecimal totalWheelWins = BigDecimal.ZERO;
     private BigDecimal highestWinMultiplier = BigDecimal.ZERO;
+    private BigDecimal totalMinorJpIncWins = BigDecimal.ZERO;
+    private BigDecimal totalMajorJpIncWins = BigDecimal.ZERO;
+    private BigDecimal totalGrandJpIncWins = BigDecimal.ZERO;
 
     private BigDecimal highestWin = BigDecimal.ZERO;
+
+    public BigDecimal getTotalMajorJpIncWins() {
+        return totalMajorJpIncWins;
+    }
+
+    public void setTotalMajorJpIncWins(BigDecimal totalMajorJpIncWins) {
+        this.totalMajorJpIncWins = totalMajorJpIncWins;
+    }
+
+    public BigDecimal getTotalGrandJpIncWins() {
+        return totalGrandJpIncWins;
+    }
+
+    public void setTotalGrandJpIncWins(BigDecimal totalGrandJpIncWins) {
+        this.totalGrandJpIncWins = totalGrandJpIncWins;
+    }
+
+    public BigDecimal getTotalMinorJpIncWins() {
+        return totalMinorJpIncWins;
+    }
+
+    public void setTotalMinorJpIncWins(BigDecimal totalMinorJpIncWins) {
+        this.totalMinorJpIncWins = totalMinorJpIncWins;
+    }
+
     private int numOfTimesFsTriggered;
     private int totalRuns;
 
@@ -22,11 +51,15 @@ public class RtpResult {
         this.totalWins = this.totalWins.add(newRtpResult.getTotalWins());
         this.totalFreeSpinsWins = this.totalFreeSpinsWins.add(newRtpResult.getTotalFreeSpinsWins());
         this.totalBaseGameWins = this.totalBaseGameWins.add(newRtpResult.getTotalBaseGameWins());
+        this.totalWheelWins = this.totalWheelWins.add(newRtpResult.getTotalWheelWins());
         this.highestWinMultiplier = this.highestWinMultiplier.add(newRtpResult.getHighestWinMultiplier());
         this.highestWin = this.highestWin.add(newRtpResult.getHighestWin());
 
         this.numOfTimesFsTriggered += newRtpResult.getNumOfTimesFsTriggered();
         this.totalRuns += newRtpResult.getTotalRuns();
+        this.totalMinorJpIncWins = this.totalMinorJpIncWins.add(newRtpResult.getTotalMinorJpIncWins());
+        this.totalMajorJpIncWins = this.totalMajorJpIncWins.add(newRtpResult.getTotalMajorJpIncWins());
+        this.totalGrandJpIncWins = this.totalGrandJpIncWins.add(newRtpResult.getTotalGrandJpIncWins());
 
 
         for (var entry : newRtpResult.getWinningMap().entrySet()) {
@@ -65,6 +98,14 @@ public class RtpResult {
 
     public BigDecimal getHighestWinMultiplier() {
         return highestWinMultiplier;
+    }
+
+    public BigDecimal getTotalWheelWins() {
+        return totalWheelWins;
+    }
+
+    public void setTotalWheelWins(BigDecimal totalWheelWins) {
+        this.totalWheelWins = totalWheelWins;
     }
 
     public void setHighestWinMultiplier(BigDecimal highestWinMultiplier) {
