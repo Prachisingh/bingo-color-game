@@ -1,4 +1,4 @@
-package slotmachine.service;
+package slotmachine.dto;
 
 import java.math.BigDecimal;
 
@@ -24,6 +24,16 @@ public enum JackpotPrizes {
         for (JackpotPrizes jackpotPrizes : JackpotPrizes.values()) {
 
             if (jackpotPrizes.index == index) {
+                return jackpotPrizes;
+            }
+        }
+        return null;
+    }
+
+    public static JackpotPrizes getPrizeBasedOnName(String name) {
+        for (JackpotPrizes jackpotPrizes : JackpotPrizes.values()) {
+
+            if (jackpotPrizes.jpName.equals(name)) {
                 return jackpotPrizes;
             }
         }

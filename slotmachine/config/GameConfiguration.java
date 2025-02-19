@@ -1,6 +1,6 @@
 package slotmachine.config;
 
-import slotmachine.dto.WeightedPrizeData;
+import slotmachine.service.WeightedPrizeData;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -40,6 +40,9 @@ public class GameConfiguration {
     public List<List<String[]>> reelSets = createReelSets();
     public WeightedPrizeData wheelPrizes = createWheelPrizes();
     public WeightedPrizeData jackpotPrizes = createJackpotPrizes();
+    public WeightedPrizeData numberToMatch = getNumbersToMatch();
+    public WeightedPrizeData numOfTypeToMatch = getNumberTypeToMatch();
+    public WeightedPrizeData ticketPrizes = createTicketPrizes();
 
     public Map createPayout() {
 
@@ -165,14 +168,19 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(4, 7));
     }
 
-    public WeightedPrizeData createReelSym6Fg() {
+    public WeightedPrizeData getNumbersToMatch() {
         return new WeightedPrizeData()
-                .addWeightedConfig(new WeightedPrizeConfig(27, 2))
-                .addWeightedConfig(new WeightedPrizeConfig(25, 3))
-                .addWeightedConfig(new WeightedPrizeConfig(19, 4))
-                .addWeightedConfig(new WeightedPrizeConfig(14, 5))
-                .addWeightedConfig(new WeightedPrizeConfig(9, 6))
-                .addWeightedConfig(new WeightedPrizeConfig(6, 7));
+                .addWeightedConfig(new WeightedPrizeConfig( 400,0))
+                .addWeightedConfig(new WeightedPrizeConfig( 300,1))
+                .addWeightedConfig(new WeightedPrizeConfig( 200,2))
+                .addWeightedConfig(new WeightedPrizeConfig( 100,3));
+    }
+    public WeightedPrizeData getNumberTypeToMatch() {
+        return new WeightedPrizeData()
+                .addWeightedConfig(new WeightedPrizeConfig( 50,0)) // normal
+                .addWeightedConfig(new WeightedPrizeConfig( 17,1)) // Minor
+                .addWeightedConfig(new WeightedPrizeConfig( 17,2)) // Major
+                .addWeightedConfig(new WeightedPrizeConfig( 16,3)); // Grand
     }
 
     public WeightedPrizeData createWheelPrizes() {
@@ -208,6 +216,22 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(50, 2))
                 .addWeightedConfig(new WeightedPrizeConfig(100, 1))
                 .addWeightedConfig(new WeightedPrizeConfig(50, 2)) ;
+    }
+
+    public WeightedPrizeData createTicketPrizes() {
+        return new WeightedPrizeData()
+                .addWeightedConfig(new WeightedPrizeConfig(200, 10))
+                .addWeightedConfig(new WeightedPrizeConfig(200, 15))
+                .addWeightedConfig(new WeightedPrizeConfig(150, 20))
+                .addWeightedConfig(new WeightedPrizeConfig(120, 25))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 30))
+                .addWeightedConfig(new WeightedPrizeConfig(70, 40))
+                .addWeightedConfig(new WeightedPrizeConfig(50, 50))
+                .addWeightedConfig(new WeightedPrizeConfig(40, 60))
+                .addWeightedConfig(new WeightedPrizeConfig(30, 75))
+                .addWeightedConfig(new WeightedPrizeConfig(20, 80))
+                .addWeightedConfig(new WeightedPrizeConfig(20, 100))
+           ;
     }
 
 }

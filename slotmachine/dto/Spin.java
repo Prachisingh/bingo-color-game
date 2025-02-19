@@ -1,6 +1,5 @@
-package slotmachine.service;
+package slotmachine.dto;
 
-import slotmachine.dto.WinData;
 import slotmachine.test.WinBand;
 
 import java.math.BigDecimal;
@@ -39,6 +38,24 @@ public class Spin {
    int fsAwarded;
 
    private Colours colours;
+   private List<Integer> scatterPositions;
+   private int scatterCount;
+
+    public List<Integer> getScatterPositions() {
+        return scatterPositions;
+    }
+
+    public int getScatterCount() {
+        return scatterCount;
+    }
+
+    public void setScatterCount(int scatterCount) {
+        this.scatterCount = scatterCount;
+    }
+
+    public void setScatterPositions(List<Integer> scatterPositions) {
+        this.scatterPositions = scatterPositions;
+    }
 
     public BigDecimal getTotalWin() {
         return totalWin;

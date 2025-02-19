@@ -1,4 +1,6 @@
-package slotmachine.service;
+package slotmachine.dto;
+
+import slotmachine.dto.Jackpot;
 
 import java.math.BigDecimal;
 

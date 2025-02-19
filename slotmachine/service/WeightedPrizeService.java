@@ -1,8 +1,6 @@
 package slotmachine.service;
 
 
-import slotmachine.dto.WeightedPrizeData;
-
 import java.util.Random;
 
 /**

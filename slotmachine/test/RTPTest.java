@@ -2,6 +2,8 @@ package slotmachine.test;
 
 import slotmachine.SlotMachine;
 import slotmachine.config.GameConfiguration;
+import slotmachine.dto.Spin;
+import slotmachine.dto.Wheel;
 import slotmachine.dto.WinData;
 import slotmachine.service.*;
 
@@ -87,9 +89,9 @@ public class RTPTest {
 
             if (baseSpin.isFsTriggered()) {
                 numOfTimesFsTriggered++;
-                Spin freeSpin = FreeSpins.playFreeSpins(rng, baseSpin.getFsAwarded(), gameConfiguration);
+                Spin freeSpin = FreeSpins.playFreeSpins(rng, baseSpin.getFsAwarded(), gameConfiguration, baseSpin.getScatterPositions(), stake);
                 freeSpinWins = freeSpin.getTotalWin();
-                 calculateOfAKindWins(freeSpin, winningMap);
+                // calculateOfAKindWins(freeSpin, winningMap);
 
             }
             totalWins = totalWins.add(baseGameWin).add(freeSpinWins).add(wheelWins);

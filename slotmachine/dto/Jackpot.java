@@ -1,4 +1,4 @@
-package slotmachine.service;
+package slotmachine.dto;
 
 public class Jackpot {
     private int jackpotValue;

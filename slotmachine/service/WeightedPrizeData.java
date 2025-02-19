@@ -1,4 +1,4 @@
-package slotmachine.dto;
+package slotmachine.service;
 
 import slotmachine.config.WeightedPrizeConfig;
 

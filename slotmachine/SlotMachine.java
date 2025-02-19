@@ -2,12 +2,14 @@ package slotmachine;
 
 import slotmachine.config.GameConfiguration;
 import slotmachine.config.SlotSymbolWaysPayConfig;
-import slotmachine.dto.WinData;
+import slotmachine.dto.*;
 import slotmachine.service.*;
 import slotmachine.util.GameUtility;
 
 import java.math.BigDecimal;
 import java.util.*;
+
+import static slotmachine.util.GameUtility.*;
 
 /**
  * Main class of the game that starts the base game, so the spinning and performs cascading. It also triggers the free games.
@@ -27,12 +29,12 @@ public class SlotMachine {
         List<String[]> bgReelSet = gameConfiguration.reelSets.getFirst();
         Spin baseGameResponse = playBaseGame(stake, rng, false, bgReelSet, gameConfiguration);
         if (baseGameResponse.isFsTriggered) {
-            FreeSpins.playFreeSpins(rng, baseGameResponse.getFsAwarded(), gameConfiguration);
+            FreeSpins.playFreeSpins(rng, baseGameResponse.getFsAwarded(), gameConfiguration, baseGameResponse.getScatterPositions(), stake);
         }
     }
 
     public static Spin playBaseGame(int stake, Random rng, boolean isFreeGame, List<String[]> bgReelsA, GameConfiguration gameConfiguration) {
-        Spin spin = new Spin();
+        Spin baseSpin = new Spin();
         List<Integer> stopPosition = new ArrayList<>();
 
         BigDecimal totalWin = BigDecimal.ZERO;
@@ -50,17 +52,17 @@ public class SlotMachine {
 
         List<List<WinData>> cascadeList = new ArrayList<>();
         int scatterCount;
-        totalWin = cascade(stake, slotFace, totalWin, stopPosition, cascadeList, spin, isFreeGame, gameConfiguration);
-        scatterCount = checkForScatterSym(slotFace, gameConfiguration);
-        if (scatterCount >= 40) {
+        totalWin = cascade(stake, slotFace, totalWin, stopPosition, cascadeList, baseSpin, isFreeGame, gameConfiguration);
+        scatterCount = checkForScatterSym(slotFace, gameConfiguration, baseSpin);
 
-            int fsAwarded = 12 + ((scatterCount - 4) * 5);
-            spin.setFsAwarded(fsAwarded);
-            spin.setFsTriggered(true);
+        if (scatterCount >= 3) {
+            baseSpin.setFsAwarded(getFsAwarded(scatterCount));
+            baseSpin.setFsTriggered(true);
+            baseSpin.setScatterCount(scatterCount);
         }
-        matchColours(spin, rng, gameConfiguration);
+        matchColours(baseSpin, rng, gameConfiguration);
 
-        if (spin.isWheelTriggered()) {
+        if (baseSpin.isWheelTriggered()) {
             Wheel wheel = new Wheel();
             int result = spinWheel(gameConfiguration, rng);
             if (result != 0) {
@@ -74,19 +76,19 @@ public class SlotMachine {
             } else {
                 // award jackpot
                 wheel.setJackpotWheelTriggered(true);
-                int index = spinJackpotWheel(gameConfiguration, rng, wheel);
+                int index = spinJackpotWheel(gameConfiguration, rng);
                 int prize = JackpotPrizes.getPrizeBasedOnIndex(index).prize;
                 wheel.setBetMultiplier(prize);
                 BigDecimal win = BigDecimal.valueOf(prize).multiply(BigDecimal.valueOf(stake));
                 wheel.setWheelWins(win);
 //                System.out.println("Jackpot win: " + win);
             }
-            spin.setWheel(wheel);
+            baseSpin.setWheel(wheel);
         }
 
-        spin.setTotalWin(totalWin);
+        baseSpin.setTotalWin(totalWin);
 
-        return spin;
+        return baseSpin;
     }
 
     private static void matchColours(Spin spin, Random rng, GameConfiguration gameConfiguration) {
@@ -111,7 +113,7 @@ public class SlotMachine {
 
     }
 
-    private static int spinJackpotWheel(GameConfiguration gameConfiguration, Random rng, Wheel wheel) {
+    public static int spinJackpotWheel(GameConfiguration gameConfiguration, Random rng) {
         return WeightedPrizeService.getPrizes(rng, gameConfiguration.jackpotPrizes);
     }
 
@@ -229,7 +231,6 @@ public class SlotMachine {
                 int reel = pos % gameConfiguration.boardWidth;
                 slotFace.get(reel)[row] = "-1";
             }
-
         }
     }
 
@@ -268,17 +269,22 @@ public class SlotMachine {
         return winDataList;
     }
 
-    private static int checkForScatterSym(List<String[]> slotFace, GameConfiguration gameConfiguration) {
+    private static int checkForScatterSym(List<String[]> slotFace, GameConfiguration gameConfiguration, Spin spin) {
         int counter = 0;
+        List<Integer> posList = new ArrayList<>();
 
         for (int col = 0; col < gameConfiguration.boardWidth; col++) {
+            int pos = col;
             for (int row = 0; row < slotFace.get(col).length; row++) {
                 String sym = slotFace.get(col)[row];
                 if (sym.contains(gameConfiguration.SCATTER)) {
+                    posList.add(pos);
                     counter++;
                 }
+                pos += 5;
             }
         }
+        spin.setScatterPositions(posList);
         return counter;
     }
 
