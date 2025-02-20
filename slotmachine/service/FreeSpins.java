@@ -27,6 +27,8 @@ public class FreeSpins {
     public static Spin playFreeSpins(Random rng, int fsAwarded, GameConfiguration gameConfiguration, List<Integer> scatterPositions, int stake) {
         // initialize bingo ticket
         BingoGame bingoGame = new BingoGame(scatterPositions);
+        BigDecimal ticketPrize = calculateTicketPrize(gameConfiguration, stake);
+        boolean isTicketWon = false;
 
         // mark scatter positions as -1
         bingoGame.removeNumberFromScatterPos(scatterPositions, bingoGame.getBingoTicket(), gameConfiguration);
@@ -46,16 +48,18 @@ public class FreeSpins {
         bingoGame.setNumberAsJackPotPos(gameConfiguration, bingoGame.getGrandJackpotPos(), "GRAND");
 
         //Sytem.out.println("Bingo ticket: ");
-
+        List<List<Integer>> winLines = gameConfiguration.winLines;
 
         Spin freeSpin = new Spin();
         BigDecimal totalWin = BigDecimal.ZERO;
+        int counter = 0;
         for (int i = fsAwarded; i > 0; i--) {
 
             // draw three random numbers for top
 
             int numToMatch = WeightedPrizeService.getPrizes(rng, gameConfiguration.numberToMatch);
             List<Integer> topNumbers = new ArrayList<>();
+            //System.out.println("Num to match: " + numToMatch);
 
             if (numToMatch == 0) {
                 topNumbers = getListOfZeroNumsToMatch(rng, bingoGame);
@@ -63,6 +67,7 @@ public class FreeSpins {
             } else if (numToMatch == 1) {
                 topNumbers.clear();
                 int numType = WeightedPrizeService.getPrizes(rng, gameConfiguration.numOfTypeToMatch);
+                //System.out.println("type: " + numType);
                 getTopNumList(rng, numType, bingoGame, topNumbers);
 
                 for (int j = 0; j < 2; j++) {
@@ -74,6 +79,7 @@ public class FreeSpins {
                 // two times loop
                 for (int j = 0; j < 2; j++) {
                     int numType = WeightedPrizeService.getPrizes(rng, gameConfiguration.numOfTypeToMatch);
+                    //System.out.println("type: " + numType);
                     getTopNumList(rng, numType, bingoGame, topNumbers);
                 }
                 int nonMatchSingleNum = getSingleNonMatchingNumber(rng, bingoGame);
@@ -84,32 +90,62 @@ public class FreeSpins {
                 topNumbers.clear();
                 for (int j = 0; j < 3; j++) {
                     int numType = WeightedPrizeService.getPrizes(rng, gameConfiguration.numOfTypeToMatch);
+                    //System.out.println("type: " + numType);
                     getTopNumList(rng, numType, bingoGame, topNumbers);
                 }
             }
 
             // mark the top numbers int the bingo ticket.
-
+            //System.out.println("Top Numbers : " + topNumbers);
             markTopNumbersInTicket(topNumbers, bingoGame.getBingoTicket());
+//            printBingoTicket(bingoGame.getBingoTicket(), gameConfiguration);
+            isTicketWon = isTicketWon(gameConfiguration, winLines, bingoGame);
+            if (isTicketWon) {
+                counter++;
+            }
         }
-        //printBingoTicket(bingoGame.getBingoTicket(), gameConfiguration);
+//        printBingoTicket(bingoGame.getBingoTicket(), gameConfiguration);
         BigDecimal minorJpWin = calculateJPPrizes(bingoGame.getBingoTicket(), "MINOR", stake, 3);
         BigDecimal majorJpWin = calculateJPPrizes(bingoGame.getBingoTicket(), "MAJOR", stake, 4);
         BigDecimal grandJpWin = calculateJPPrizes(bingoGame.getBingoTicket(), "GRAND", stake, 5);
 
         //TODO add winning lines
-        BigDecimal ticketPrize = calculate15XTicketPrize(false, gameConfiguration, stake);
 
+
+        if (counter == 0) {
+            ticketPrize = BigDecimal.ZERO;
+        }
         totalWin = totalWin.add(minorJpWin).add(majorJpWin).add(grandJpWin).add(ticketPrize);
+        //System.out.println("Minor win " + minorJpWin);
+        //System.out.println("Major win " + majorJpWin);
+        //System.out.println("Grand win" + grandJpWin);
+        //System.out.println("ticket prize " + ticketPrize);
 
         freeSpin.setTotalWin(totalWin);
         return freeSpin;
     }
 
-    private static BigDecimal calculate15XTicketPrize(boolean isWon, GameConfiguration gameConfiguration, int stake) {
-        if (!isWon) {
-            return BigDecimal.ZERO;
+    private static boolean isTicketWon(GameConfiguration gameConfiguration, List<List<Integer>> winLines, BingoGame bingoGame) {
+        boolean isTicketWon = false;
+        for (List<Integer> winLine : winLines) {
+            int count = 0;
+            for (Integer pos : winLine) {
+                int row = pos / gameConfiguration.boardWidth;
+                int reel = pos % gameConfiguration.boardWidth;
+                BoardNumbers boardNumber = bingoGame.getBingoTicket().get(reel).get(row);
+                if (boardNumber.isWin()) {
+                    count++;
+                }
+            }
+            if (count == 5) {
+                isTicketWon = true;
+                break;
+            }
         }
+        return isTicketWon;
+    }
+
+    private static BigDecimal calculateTicketPrize(GameConfiguration gameConfiguration, int stake) {
         int prize = WeightedPrizeService.getPrizes(rng, gameConfiguration.ticketPrizes);
         return BigDecimal.valueOf(prize).multiply(BigDecimal.valueOf(stake));
     }
@@ -124,7 +160,7 @@ public class FreeSpins {
                 }
             }
         }
-        if(count == totalCount){
+        if (count == totalCount) {
             prize = JackpotPrizes.getPrizeBasedOnName(jpType).prize;
         }
         return BigDecimal.valueOf(prize).multiply(BigDecimal.valueOf(stake));

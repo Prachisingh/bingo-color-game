@@ -60,10 +60,11 @@ public class BoardNumbers {
     public String toString() {
         return "BoardNumbers{" +
                 "number=" + number +
-                ", NumberType='" + numType + '\'' +
+                ", numType='" + numType + '\'' +
                 ", isJackPot=" + isJackPot +
                 ", isWin=" + isWin +
                 ", isScatter=" + isScatter +
+                ", position=" + position +
                 '}';
     }
 }

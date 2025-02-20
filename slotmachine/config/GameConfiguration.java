@@ -43,6 +43,7 @@ public class GameConfiguration {
     public WeightedPrizeData numberToMatch = getNumbersToMatch();
     public WeightedPrizeData numOfTypeToMatch = getNumberTypeToMatch();
     public WeightedPrizeData ticketPrizes = createTicketPrizes();
+    public List<List<Integer>> winLines = getWinLines();
 
     public Map createPayout() {
 
@@ -158,29 +159,20 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(4, 7));
     }
 
-    public WeightedPrizeData createReelSym5Fg() {
-        return new WeightedPrizeData()
-                .addWeightedConfig(new WeightedPrizeConfig(31, 2))
-                .addWeightedConfig(new WeightedPrizeConfig(25, 3))
-                .addWeightedConfig(new WeightedPrizeConfig(20, 4))
-                .addWeightedConfig(new WeightedPrizeConfig(13, 5))
-                .addWeightedConfig(new WeightedPrizeConfig(7, 6))
-                .addWeightedConfig(new WeightedPrizeConfig(4, 7));
-    }
-
     public WeightedPrizeData getNumbersToMatch() {
         return new WeightedPrizeData()
-                .addWeightedConfig(new WeightedPrizeConfig( 400,0))
-                .addWeightedConfig(new WeightedPrizeConfig( 300,1))
-                .addWeightedConfig(new WeightedPrizeConfig( 200,2))
-                .addWeightedConfig(new WeightedPrizeConfig( 100,3));
+                .addWeightedConfig(new WeightedPrizeConfig(400, 0))
+                .addWeightedConfig(new WeightedPrizeConfig(300, 1))
+                .addWeightedConfig(new WeightedPrizeConfig(200, 2))
+                .addWeightedConfig(new WeightedPrizeConfig(100, 3));
     }
+
     public WeightedPrizeData getNumberTypeToMatch() {
         return new WeightedPrizeData()
-                .addWeightedConfig(new WeightedPrizeConfig( 50,0)) // normal
-                .addWeightedConfig(new WeightedPrizeConfig( 17,1)) // Minor
-                .addWeightedConfig(new WeightedPrizeConfig( 17,2)) // Major
-                .addWeightedConfig(new WeightedPrizeConfig( 16,3)); // Grand
+                .addWeightedConfig(new WeightedPrizeConfig(50, 0)) // normal
+                .addWeightedConfig(new WeightedPrizeConfig(17, 1)) // Minor
+                .addWeightedConfig(new WeightedPrizeConfig(17, 2)) // Major
+                .addWeightedConfig(new WeightedPrizeConfig(16, 3)); // Grand
     }
 
     public WeightedPrizeData createWheelPrizes() {
@@ -198,8 +190,9 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(80, 15))
                 .addWeightedConfig(new WeightedPrizeConfig(60, 30))
                 .addWeightedConfig(new WeightedPrizeConfig(80, 20))
-                .addWeightedConfig(new WeightedPrizeConfig(50, 50)) ;
+                .addWeightedConfig(new WeightedPrizeConfig(50, 50));
     }
+
     public WeightedPrizeData createJackpotPrizes() {
         return new WeightedPrizeData()
                 .addWeightedConfig(new WeightedPrizeConfig(100, 1))
@@ -215,7 +208,7 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(100, 1))
                 .addWeightedConfig(new WeightedPrizeConfig(50, 2))
                 .addWeightedConfig(new WeightedPrizeConfig(100, 1))
-                .addWeightedConfig(new WeightedPrizeConfig(50, 2)) ;
+                .addWeightedConfig(new WeightedPrizeConfig(50, 2));
     }
 
     public WeightedPrizeData createTicketPrizes() {
@@ -231,7 +224,28 @@ public class GameConfiguration {
                 .addWeightedConfig(new WeightedPrizeConfig(30, 75))
                 .addWeightedConfig(new WeightedPrizeConfig(20, 80))
                 .addWeightedConfig(new WeightedPrizeConfig(20, 100))
-           ;
+                ;
     }
 
+    private List<List<Integer>> getWinLines() {
+
+        return List.of(
+                List.of(20, 16, 12, 8, 4),
+                List.of(0, 6, 12, 18, 24),
+
+                List.of(0, 1, 2, 3, 4),
+                List.of(5, 6, 7, 8, 9),
+                List.of(10, 11, 12, 13, 14),
+                List.of(15, 16, 17, 18, 19),
+                List.of(20, 21, 22, 23, 24),
+
+                List.of(0, 5, 10, 15, 20),
+                List.of(1, 6, 11, 16, 21),
+                List.of(2, 7, 12, 17, 22),
+                List.of(3, 8, 13, 18, 23),
+                List.of(4, 9, 14, 19, 24)
+        );
+
+
+    }
 }

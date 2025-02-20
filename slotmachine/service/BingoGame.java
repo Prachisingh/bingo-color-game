@@ -46,6 +46,17 @@ public class BingoGame {
         bingoTicket.add(column3);
         bingoTicket.add(column4);
         bingoTicket.add(column5);
+        setBoarNumberPositions(bingoTicket);
+    }
+
+    private void setBoarNumberPositions(List<List<BoardNumbers>> bingoTicket) {
+        for (int col = 0; col < 5; col++) {
+            int pos = col;
+            for (int row = 0; row < bingoTicket.get(col).size(); row++) {
+                bingoTicket.get(col).get(row).setPosition(pos);
+                pos += 5;
+            }
+        }
     }
 
     public List<List<BoardNumbers>> getBingoTicket() {
@@ -86,6 +97,7 @@ public class BingoGame {
             boardNumber.setNumber(-1);
             boardNumber.setScatter(true);
             boardNumber.setNumType("scatter");
+            boardNumber.setWin(true);
             bingoTicket.get(reel).set(row, boardNumber);
         }
     }
@@ -97,7 +109,6 @@ public class BingoGame {
             BoardNumbers boardNumber = bingoTicket.get(reel).get(row);
             boardNumber.setJackPot(true);
             boardNumber.setNumType(jpName);
-            bingoTicket.get(reel).set(row, boardNumber);
         }
     }
 
